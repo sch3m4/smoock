@@ -3,7 +3,7 @@ Smoock
 
 Smoock is a little python script to wake up smoothly ;-)
 
-It randomly choose a file from a given path, and reproduces it increasing the volume.
+It randomly chooses a file from a given path, and reproduces it increasing the volume.
 
 In order to close the program (and mute the sound) you will have to solve a "mathematic challenge". Unless you solve it, the music will stay rockin'!!!
 
