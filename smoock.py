@@ -25,12 +25,12 @@ AOUTPUT='oss' # mplayer audo output (alsa,pulseaudio,oss,etc.)
 MIXER='/usr/bin/ossmix' # audio mixer tool
 MIXER_STR='vmix0-outvol' # string to master audio device
 MPLAYER='/usr/bin/mplayer' # path to mplayer binary
-PLPATH='/home/chema/smoock/sounds/' # path containing the audio files to randomly choose the one to be reproduced
+PLPATH='/home/chema/smoock/sounds' # path containing the audio files to randomly choose the one to be reproduced
 
-MIN_VOL=10 # min. volume value
+MIN_VOL=15 # min. volume value
 MAX_VOL=25 # max. volume value
-DELTA=0.5 # volume increment
-DELAY=3 # volume increment's delay
+DELTA=0.2 # volume increment
+DELAY=6 # volume increment's delay
 
 PID=None # main child process PID (mplayer)
 
@@ -60,7 +60,7 @@ def set_vol(val):
 	"""
 	with open(os.devnull,"w") as fnull:
 		res = subprocess.Popen([MIXER,MIXER_STR,val],stdout = fnull, stderr = fnull)
-		os.waitpid(res.pid)
+		os.waitpid(res.pid,0)
 
 def create_challenge():
 	"""
@@ -97,16 +97,23 @@ def smooth_clock():
 	"""
 	Function to choose the file from the "playlist" and reproduce it
 	"""
-	
-	# chooses the file
-	file = PLPATH + '/' + random.sample(os.listdir(PLPATH),1)[0]
+
+	print "[+] Wake up program started"
+
+	# sets the initial volume value
+	attempt = 0
+	curvol = MIN_VOL
+	set_vol(str(curvol))
 
 	while CHALLENGE_SOLVED is False:
-		# sets the initial volume value
-		curvol = MIN_VOL
-		set_vol(str(curvol))
+		# chooses the file
+		file = PLPATH + '/' + random.sample(os.listdir(PLPATH),1)[0]
+
 		# plays the file
+		attempt += 1
+		print "- Attempt %d, playing file \"%s\"" % (file,attempt)
 		play_file(file)
+
 		# smooth effect to increase the volume
 		while curvol < MAX_VOL and CHALLENGE_SOLVED is False:
 			time.sleep(DELAY)
@@ -115,7 +122,10 @@ def smooth_clock():
 
 		while CHALLENGE_SOLVED is False:
 			# waits for mplayer to finish
-			os.waitpid(PID,3)
+			try:
+				os.waitpid(PID,3)
+			except:
+				break
 
 	# once the challenge has been solved...
 	os.kill(PID,signal.SIGKILL)
@@ -138,9 +148,10 @@ def check_challenge():
 
 		if resp == CHALLENGESOL:
 			CHALLENGE_SOLVED = True
-			print "Challenge Solved!"
+			print "[+] Challenge Solved! Good Morning!!"
 		else:
-			print "Incorrect challenge solution!"
+			print "[!] Incorrect challenge solution! Come on guy, wake up!"
+			os.remove(WAKEUP_FILE)
 			time.sleep(5)
 
 
@@ -161,4 +172,3 @@ if __name__ == "__main__":
 	os.remove(WAKEUP_FILE)
 
 	sys.exit(0);
-
