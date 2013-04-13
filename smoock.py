@@ -111,7 +111,7 @@ def smooth_clock():
 
 		# plays the file
 		attempt += 1
-		print "- Attempt %d, playing file \"%s\"" % (file,attempt)
+		print "- Attempt %d, playing file \"%s\"" % (attempt,file)
 		play_file(file)
 
 		# smooth effect to increase the volume
@@ -166,6 +166,8 @@ if __name__ == "__main__":
 	check_challenge()
 	# waits for the thread
 	thread.join()
+	
+	set_vol(MAX_VOL)
 
 	# removes the files
 	os.remove(CHALLENGE_FILE)
