@@ -167,7 +167,7 @@ if __name__ == "__main__":
 	# waits for the thread
 	thread.join()
 	
-	set_vol(MAX_VOL)
+	set_vol(str(MAX_VOL))
 
 	# removes the files
 	os.remove(CHALLENGE_FILE)
