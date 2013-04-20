@@ -27,10 +27,10 @@ MIXER_STR='vmix0-outvol' # string to master audio device
 MPLAYER='/usr/bin/mplayer' # path to mplayer binary
 PLPATH='/home/chema/smoock/sounds' # path containing the audio files to randomly choose the one to be reproduced
 
-MIN_VOL=15 # min. volume value
+MIN_VOL=17 # min. volume value
 MAX_VOL=25 # max. volume value
 DELTA=0.2 # volume increment
-DELAY=6 # volume increment's delay
+DELAY=5 # volume increment's delay
 
 PID=None # main child process PID (mplayer)
 
@@ -43,6 +43,9 @@ CHALLENGE=None # challenge string
 CHALLENGESOL=None # challenge solution
 CHALLENGE_SOLVED = False # is the challenge solver?
 WAKEUP_FILE='/home/chema/solution' # file containing the solution (created by user)
+
+SPEAK='/usr/bin/di'
+SPEAK_PHRASE='sample text'
 
 
 def play_file(path):
@@ -60,6 +63,14 @@ def set_vol(val):
 	"""
 	with open(os.devnull,"w") as fnull:
 		res = subprocess.Popen([MIXER,MIXER_STR,val],stdout = fnull, stderr = fnull)
+		os.waitpid(res.pid,0)
+
+def say(text):
+	"""
+	Executes the script to 'say' the text given
+	"""
+	with open(os.devnull,"w") as fnull:
+		res = subprocess.Popen([SPEAK,text],stdout = fnull, stderr = fnull)
 		os.waitpid(res.pid,0)
 
 def create_challenge():
@@ -106,6 +117,8 @@ def smooth_clock():
 	set_vol(str(curvol))
 
 	while CHALLENGE_SOLVED is False:
+		# say good morning ;)
+		say(SPEAK_PHRASE)
 		# chooses the file
 		file = PLPATH + '/' + random.sample(os.listdir(PLPATH),1)[0]
 
@@ -166,8 +179,6 @@ if __name__ == "__main__":
 	check_challenge()
 	# waits for the thread
 	thread.join()
-	
-	set_vol(str(MAX_VOL))
 
 	# removes the files
 	os.remove(CHALLENGE_FILE)
